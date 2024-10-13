@@ -34,6 +34,7 @@ subprojects {
         annotationProcessor 'org.projectlombok:lombok'
 
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'javax.servlet:javax.servlet-api:4.0.1'
         implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
 
     }
@@ -77,6 +78,9 @@ project(':module-data') {
         implementation("org.flywaydb:flyway-core")
         implementation("org.flywaydb:flyway-mysql")
 
+        /* 모듈 영역 */
+        implementation project(':module-common')
+
     }
     bootJar {
         enabled = false
@@ -88,6 +92,8 @@ project(':module-data') {
 
 project(':module-common') {
     dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
     }
     bootJar {
