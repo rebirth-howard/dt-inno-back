@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.5'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+allprojects {
+    group = 'com.deutschmotors'
+    version = '0.0.1-SNAPSHOT'
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+            vendor = JvmVendorSpec.AMAZON
+        }
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    dependencies {
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+    }
+}
+
+project(':module-api') {
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+        /* 모듈 영역 */
+        implementation project(':module-data')
+        implementation project(':module-common')
+    }
+
+    tasks.register("prepareKotlinBuildScriptModel") {}
+
+    bootJar {
+        enabled = true
+    }
+    jar {
+        enabled = false
+    }
+}
+
+project(':module-data') {
+    dependencies {
+
+    }
+    bootJar {
+        enabled = false
+    }
+    jar {
+        enabled = true
+    }
+}
+
+project(':module-common') {
+    dependencies {
+
+    }
+    bootJar {
+        enabled = false
+    }
+    jar {
+        enabled = true
+    }
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = false
+}

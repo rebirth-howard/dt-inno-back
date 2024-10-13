@@ -1,0 +1,6 @@
+rootProject.name = 'dt-inno-back'
+
+include 'module-common'
+include 'module-data'
+include 'module-api'
+
