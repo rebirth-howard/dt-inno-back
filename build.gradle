@@ -67,7 +67,8 @@ project(':module-data') {
     dependencies {
 
         implementation 'software.aws.rds:aws-mysql-jdbc:1.1.14'
-        runtimeOnly 'com.mysql:mysql-connector-j'
+        implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'
+        implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
         // querydsl 의존성 추가
         annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta" // querydsl JPAAnnotationProcessor 사용 지정

@@ -12,14 +12,15 @@ spring:
   jpa:
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        use_sql_comments: false
+        show-sql: false
     hibernate:
       ddl-auto: validate
       naming:
         physical-strategy: com.deutschmotors.moduledata.common.jpa.UppercaseSnakePhysicalNamingStrategy
     generate-ddl: false
     open-in-view: false
-    show-sql: true
   flyway:
     baseline-on-migrate: false # 새 데이터베이스 생성 시 초기 baseline을 사용하지 않도록 설정
     enabled: true # Flyway 사용 여부
