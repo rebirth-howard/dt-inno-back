@@ -1,0 +1,14 @@
+spring:
+  config:
+    import:
+      - 'classpath:persistence-property-prod.yml'
+
+debug: false
+
+logging:
+  level:
+    com.deutschmotors : debug
+    org.springframework.web.servlet: debug
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
+    org.flywaydb: info

@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    hikari:
+      driver-class-name: software.aws.rds.jdbc.mysql.Driver
+      jdbc-url: jdbc:mysql://localhost:53306/dtinnodb?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true
+      username: root
+      password: root123!@#
+      poolName: DtInnoDbHikariCP
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      maximum-pool-size: 10
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: com.deutschmotors.moduledata.common.jpa.UppercaseSnakePhysicalNamingStrategy
+    generate-ddl: false
+    open-in-view: false
+    show-sql: true
