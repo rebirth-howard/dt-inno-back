@@ -8,6 +8,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/module-api" />
+            <option value="$PROJECT_DIR$/module-common" />
             <option value="$PROJECT_DIR$/module-data" />
           </set>
         </option>
@@ -16,7 +18,10 @@
         <option name="externalProjectPath" value="$PROJECT_DIR$/module-api" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/module-api" />
+            <option value="$PROJECT_DIR$/module-common" />
+            <option value="$PROJECT_DIR$/module-data" />
           </set>
         </option>
       </GradleProjectSettings>
