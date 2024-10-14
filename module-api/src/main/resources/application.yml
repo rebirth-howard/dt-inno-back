@@ -2,8 +2,15 @@ spring:
   config:
     import:
       - 'classpath:persistence-property.yml'
-
-debug: false
+jwt:
+  pre-fix:
+    server: api
+  access-token:
+    secret-key: RFQtSW5ub3ZhdGlvbl9KV1RfVG9rZW5fU2VjcmV0S2V5 # DT-Innovation_JWT_Access_Token_SecretKey
+    expiration-ms: 3600000 # 1Hour
+  refresh-token:
+    secret-key: RFQtSW5ub3ZhdGlvbl9KV1RfVG9rZW5fU2VjcmV0S2V5 # DT-Innovation_JWT_Refresh_Token_SecretKey
+    expiration-ms: 604800000 # 7days
 
 logging:
   level:

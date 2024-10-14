@@ -22,7 +22,7 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!(authentication instanceof AuthAuthenticationToken)) {
-            throw new ApiException(AuthErrorCode.ILLEGAL_ARGUMENT, "Only CustomAuthenticationToken is supported");
+            throw new ApiException(AuthErrorCode.AUTH_EXCEPTION, "Only CustomAuthenticationToken is supported");
         }
 
         AuthAuthenticationToken customAuth = (AuthAuthenticationToken) authentication;

@@ -1,6 +1,8 @@
 package com.deutschmotors.moduleapi.domain.auth.model;
 
 import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
+import com.deutschmotors.modulecommon.jwt.CommonUserDetails;
+import com.deutschmotors.moduledata.entity.user.UserEntity;
 import com.deutschmotors.moduledata.entity.user.enums.UserStatus;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -66,6 +68,27 @@ public class AuthUserDetails implements UserDetails {
         return status == UserStatus.APPROVED; // 승인된 사용자만 활성화된 것으로 간주
     }
 
+    public static AuthUserDetails from(UserEntity user) {
+        Set<GrantedAuthority> authorities = user.getUserRoles().stream()
+                .map(userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName()))
+                .collect(Collectors.toSet());
+
+        AuthUserDetails authUserDetails = AuthUserDetails.builder()
+                .id(user.getId())
+                .loginId(user.getLoginId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .status(user.getStatus())
+                .createdAt(user.getCreatedAt())
+                .createdBy(user.getCreatedBy())
+                .updatedAt(user.getUpdatedAt())
+                .updatedBy(user.getUpdatedBy())
+                .userRoles(authorities)
+                .build();
+
+        return authUserDetails;
+    }
+
     public static UserDetails from(UserResponse user) {
         Set<GrantedAuthority> authorities = user.getUserRoles().stream()
                 .map(userRole -> new SimpleGrantedAuthority(userRole.getRoleName()))
@@ -86,5 +109,15 @@ public class AuthUserDetails implements UserDetails {
         return authUserDetails;
     }
 
+    public CommonUserDetails toCommonUserDetails() {
+        return new CommonUserDetails(
+                this.getUsername(),
+                this.getPassword(),
+                this.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()),
+                this.isAccountNonExpired(),
+                this.isAccountNonLocked(),
+                this.isCredentialsNonExpired(),
+                this.isEnabled()
+        );
+    }
 }
-

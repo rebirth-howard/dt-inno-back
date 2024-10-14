@@ -18,6 +18,7 @@ public class AuthAuthenticationToken implements Authentication {
     private String credentials;
     private Collection<? extends GrantedAuthority> authorities;
     private boolean authenticated;
+    @Setter private Object details;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

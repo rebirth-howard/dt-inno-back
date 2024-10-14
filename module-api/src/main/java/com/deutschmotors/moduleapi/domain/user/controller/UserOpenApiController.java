@@ -2,8 +2,8 @@ package com.deutschmotors.moduleapi.domain.user.controller;
 
 import com.deutschmotors.moduleapi.domain.user.business.UserBusiness;
 import com.deutschmotors.moduleapi.domain.user.controller.model.UserLoginRequest;
-import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
 import com.deutschmotors.modulecommon.apispec.Api;
+import com.deutschmotors.modulecommon.jwt.TokenResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +19,11 @@ public class UserOpenApiController {
     private final UserBusiness userBusiness;
 
     @PostMapping("/login")
-    public Api<UserResponse> login(
+    public Api<TokenResponse> login(
             @Valid
             @RequestBody Api<UserLoginRequest> request
     ) {
-        UserResponse response = userBusiness.login(request.getBody());
+        TokenResponse response = userBusiness.login(request.getBody());
         return Api.OK(response);
     }
 
