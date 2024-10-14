@@ -1,6 +1,7 @@
 package com.deutschmotors.moduleapi.domain.user.controller;
 
 import com.deutschmotors.moduleapi.domain.user.business.UserBusiness;
+import com.deutschmotors.moduleapi.domain.user.controller.model.RefreshTokenRequest;
 import com.deutschmotors.moduleapi.domain.user.controller.model.UserLoginRequest;
 import com.deutschmotors.modulecommon.apispec.Api;
 import com.deutschmotors.modulecommon.jwt.TokenResponse;
@@ -24,6 +25,14 @@ public class UserOpenApiController {
             @RequestBody Api<UserLoginRequest> request
     ) {
         TokenResponse response = userBusiness.login(request.getBody());
+        return Api.OK(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public Api<TokenResponse> refreshToken(
+            @RequestBody @Valid RefreshTokenRequest request
+    ) {
+        TokenResponse response = userBusiness.createAccessToken(request);
         return Api.OK(response);
     }
 

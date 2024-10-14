@@ -2,6 +2,7 @@ package com.deutschmotors.moduleapi.domain.user.business;
 
 import com.deutschmotors.moduleapi.domain.auth.business.AuthBusiness;
 import com.deutschmotors.moduleapi.domain.auth.model.AuthRequest;
+import com.deutschmotors.moduleapi.domain.user.controller.model.RefreshTokenRequest;
 import com.deutschmotors.moduleapi.domain.user.controller.model.UserLoginRequest;
 import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
 import com.deutschmotors.moduleapi.domain.user.converter.UserConverter;
@@ -40,6 +41,12 @@ public class UserBusiness {
         return authBusiness.issueToken(AuthRequest.from(request), userEntity);
 
     }
+
+    public TokenResponse createAccessToken(RefreshTokenRequest request) {
+        return authBusiness.issueToken(request.getRefreshToken());
+    }
+
+
 
     public UserResponse me() {
         UserEntity userEntity = userService.getRegisterUser("user_normal");

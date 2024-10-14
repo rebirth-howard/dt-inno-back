@@ -61,6 +61,22 @@ public class AuthBusiness {
         throw new ApiException(AuthErrorCode.TOKEN_EXCEPTION);
     }
 
+    public TokenResponse issueToken(String refreshToken) {
+
+        // 리프레시 토큰 검증
+        boolean isValid = authService.validateRefreshToken(refreshToken);
+        String username = authService.extractUsername(refreshToken);
+
+        // 유효하면 유저 조회
+        AuthUserDetails authUserDetails = (AuthUserDetails) authService.loadUserByUsername(username);
+
+        // 신규 토큰 발행
+        TokenResponse response = authService.refreshAccessToken(refreshToken, authUserDetails.toCommonUserDetails());
+
+        return response;
+    }
+
+
     private AuthUserDetails extractedBy(UserEntity user) {
         Set<GrantedAuthority> authorities = user.getUserRoles().stream()
                 .map(role -> new SimpleGrantedAuthority(role.getRole().getRoleName()))

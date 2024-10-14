@@ -51,4 +51,20 @@ public class AuthService implements UserDetailsService {
         return tokenHelper.generateToken(userDetails);
     }
 
+    public TokenResponse refreshAccessToken(String refreshToken, CommonUserDetails userDetails) {
+        return tokenHelper.refreshAccessToken(refreshToken, userDetails);
+    }
+
+    public boolean validateRefreshToken(String refreshToken) {
+        return tokenHelper.validateRefreshToken(refreshToken);
+    }
+
+    public String extractUsername(String refreshToken) {
+        return tokenHelper.extractUsername(refreshToken);
+    }
+
+
+
+
+
 }
