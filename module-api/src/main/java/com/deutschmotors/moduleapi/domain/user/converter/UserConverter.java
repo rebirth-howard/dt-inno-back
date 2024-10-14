@@ -1,7 +1,7 @@
-package com.deutschmotors.moduleapi.domain.converter;
+package com.deutschmotors.moduleapi.domain.user.converter;
 
-import com.deutschmotors.moduleapi.domain.controller.model.UserResponse;
-import com.deutschmotors.moduleapi.domain.controller.model.UserRoleResponse;
+import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
+import com.deutschmotors.moduleapi.domain.user.controller.model.UserRoleResponse;
 import com.deutschmotors.modulecommon.error.ErrorCode;
 import com.deutschmotors.modulecommon.exception.ApiException;
 import com.deutschmotors.moduledata.entity.user.UserEntity;

@@ -1,4 +1,4 @@
-package com.deutschmotors.moduleapi.domain.service;
+package com.deutschmotors.moduleapi.domain.user.service;
 
 import com.deutschmotors.modulecommon.error.UserErrorCode;
 import com.deutschmotors.modulecommon.exception.ApiException;

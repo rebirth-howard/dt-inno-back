@@ -1,7 +1,7 @@
-package com.deutschmotors.moduleapi.domain.controller;
+package com.deutschmotors.moduleapi.domain.user.controller;
 
-import com.deutschmotors.moduleapi.domain.business.UserBusiness;
-import com.deutschmotors.moduleapi.domain.controller.model.UserResponse;
+import com.deutschmotors.moduleapi.domain.user.business.UserBusiness;
+import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
 import com.deutschmotors.modulecommon.apispec.Api;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

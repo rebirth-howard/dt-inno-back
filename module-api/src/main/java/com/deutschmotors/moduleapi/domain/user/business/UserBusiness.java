@@ -1,9 +1,9 @@
-package com.deutschmotors.moduleapi.domain.business;
+package com.deutschmotors.moduleapi.domain.user.business;
 
-import com.deutschmotors.moduleapi.domain.controller.model.UserLoginRequest;
-import com.deutschmotors.moduleapi.domain.controller.model.UserResponse;
-import com.deutschmotors.moduleapi.domain.converter.UserConverter;
-import com.deutschmotors.moduleapi.domain.service.UserService;
+import com.deutschmotors.moduleapi.domain.user.controller.model.UserLoginRequest;
+import com.deutschmotors.moduleapi.domain.user.controller.model.UserResponse;
+import com.deutschmotors.moduleapi.domain.user.converter.UserConverter;
+import com.deutschmotors.moduleapi.domain.user.service.UserService;
 import com.deutschmotors.moduledata.entity.user.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

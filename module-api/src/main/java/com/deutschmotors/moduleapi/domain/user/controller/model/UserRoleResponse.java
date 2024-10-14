@@ -1,4 +1,4 @@
-package com.deutschmotors.moduleapi.domain.controller.model;
+package com.deutschmotors.moduleapi.domain.user.controller.model;
 
 import lombok.*;
 
