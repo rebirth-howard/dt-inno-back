@@ -95,6 +95,7 @@ project(':module-data') {
 project(':module-common') {
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-data-redis'
         implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 
         // jwt

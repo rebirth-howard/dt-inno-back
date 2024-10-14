@@ -2,6 +2,16 @@ spring:
   config:
     import:
       - 'classpath:persistence-property.yml'
+  data:
+    redis:
+      host: localhost
+      port: 46379
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: 10000ms
 jwt:
   pre-fix:
     server: api
@@ -19,4 +29,5 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql: TRACE
     org.flywaydb: info
+    org.springframework.data.redis: DEBUG
     security=DEBUG:

@@ -2,8 +2,11 @@ package com.deutschmotors.modulecommon.jwt;
 
 import com.deutschmotors.modulecommon.error.AuthErrorCode;
 import com.deutschmotors.modulecommon.exception.ApiException;
+import com.deutschmotors.modulecommon.redis.CommoneRedisCache;
+import com.deutschmotors.modulecommon.redis.RedisCacheHelper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,25 @@ public class TokenHelper {
 
     @Value("${jwt.pre-fix.server}")
     private String server;
+
+    private final RedisCacheHelper redisCacheHelper;
+    private final Map<String, CommoneRedisCache> redisKeys = new HashMap<>();
+
+    @PostConstruct
+    public void initializeDefaults() {
+        // 기본 TTL 설정
+        redisKeys.put(CommoneRedisCache.DEFAULT.getKey(), CommoneRedisCache.DEFAULT);
+        redisKeys.put(CommoneRedisCache.JWT_ACCESS_TOKEN.getKey(), CommoneRedisCache.JWT_ACCESS_TOKEN);
+        redisKeys.put(CommoneRedisCache.JWT_REFRESH_TOKEN.getKey(), CommoneRedisCache.JWT_REFRESH_TOKEN);
+    }
+
+    public void addRedisKey(CommoneRedisCache redisKey) {
+        redisKeys.put(redisKey.getKey(), redisKey);
+    }
+
+    public CommoneRedisCache getRedisKey(String key) {
+        return redisKeys.getOrDefault(key, CommoneRedisCache.DEFAULT);
+    }
 
 
     private SecretKey getAccessTokenSecretKey() {
@@ -128,8 +150,11 @@ public class TokenHelper {
 
     // 액세스 토큰과 리프레시 토큰을 생성하는 메서드
     public TokenResponse generateToken(CommonUserDetails userDetails) {
-        String accessToken = generateToken(userDetails, "jwtAccessToken", getAccessTokenSecretKey());
-        String refreshToken = generateToken(userDetails, "jwtRefreshToken", getRefreshTokenSecretKey());
+        String accessToken = generateToken(userDetails, CommoneRedisCache.JWT_ACCESS_TOKEN, getAccessTokenSecretKey());
+        String refreshToken = generateToken(userDetails, CommoneRedisCache.JWT_REFRESH_TOKEN, getRefreshTokenSecretKey());
+        // Redis에 토큰 저장 추가
+//        storeAccessToken(userDetails.getUsername(), accessToken);
+        storeRefreshToken(userDetails.getUsername(), refreshToken);
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .accessTokenExpiredAt(convertDateToLocalDateTime(extractExpiration(accessToken, true)))
@@ -140,7 +165,9 @@ public class TokenHelper {
 
     // 액세스 토큰을 생성하는 메서드
     public String generateAccessToken(CommonUserDetails userDetails) {
-        String token = generateToken(userDetails, "jwtAccessToken", getAccessTokenSecretKey());
+        String token = generateToken(userDetails, CommoneRedisCache.JWT_ACCESS_TOKEN, getAccessTokenSecretKey());
+//        storeAccessToken(userDetails.getUsername(), token);
+        trackUserSession(userDetails.getUsername(), token, CommoneRedisCache.JWT_ACCESS_TOKEN.getKey());
         return token;
     }
 
@@ -148,17 +175,18 @@ public class TokenHelper {
     public String generateRefreshToken(CommonUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "refresh");
-        String refreshToken = generateTokenWithClaims(userDetails.getUsername(), claims, 604800000, getRefreshTokenSecretKey());
+        String refreshToken = generateTokenWithClaims(userDetails.getUsername(), claims, calculateExpiration(CommoneRedisCache.JWT_REFRESH_TOKEN), getRefreshTokenSecretKey());
+        storeRefreshToken(userDetails.getUsername(), refreshToken);
         return refreshToken;
     }
 
     // JWT 토큰을 생성하는 일반적인 메서드
     private String generateToken(CommonUserDetails userDetails,
-                                 String cache,
+                                 CommoneRedisCache cache,
                                  SecretKey key) {
         return generateTokenWithClaims(userDetails.getUsername(),
                 Map.of("roles", new ArrayList<>(userDetails.getAuthorities())),
-                604800000,
+                calculateExpiration(cache),
                 key);
     }
 
@@ -179,10 +207,37 @@ public class TokenHelper {
         return server + ":" + type + ":";
     }
 
+    // 사용자 세션을 Redis에 저장하는 메서드
+    private void trackUserSession(String username, String token, String cacheKey) {
+        CommoneRedisCache cache = redisKeys.get(cacheKey);
+        // session:UUID
+        redisCacheHelper.setStringValue(KeyType.SESSION.getPreFix() + username, token, cache.getDuration(), cache.getUnit());
+    }
+
+    // 단일 기기 관리: 새로운 토큰이 발급될 때 기존 세션을 무효화 (Redis에서 삭제)
+    public void invalidatePreviousSession(String username) {
+        // session:loginId
+        redisCacheHelper.deleteKey(KeyType.SESSION.getPreFix() + username);
+    }
+
+    // 액세스 토큰을 Redis에 저장하는 메서드
+    private void storeAccessToken(String username, String accessToken) {
+        CommoneRedisCache cache = CommoneRedisCache.JWT_ACCESS_TOKEN;
+        redisCacheHelper.setStringValue(cache.getKey() + ":" + username, accessToken, cache.getDuration(), cache.getUnit());
+    }
+
+    // 리프레시 토큰을 Redis에 저장하는 메서드
+    private void storeRefreshToken(String username, String refreshToken) {
+        CommoneRedisCache cache = CommoneRedisCache.JWT_REFRESH_TOKEN;
+        //jwtRefreshToken:UUID
+        redisCacheHelper.setStringValue(cache.getKey() + ":" + username, refreshToken, cache.getDuration(), cache.getUnit());
+    }
+
     // 액세스 토큰 갱신 메서드 (리프레시 토큰을 검증하고 새로운 액세스 토큰 발급)
     public TokenResponse refreshAccessToken(String refreshToken, CommonUserDetails userDetails) {
         if (validateRefreshToken(refreshToken)) {
             String username = extractClaim(refreshToken, Claims::getSubject, getRefreshTokenSecretKey());
+            invalidatePreviousSession(username); // 기존 세션 무효화
             String newAccessToken = generateAccessToken(userDetails);
             String newRefreshToken = generateRefreshToken(userDetails);
 
@@ -193,7 +248,12 @@ public class TokenHelper {
                     .refreshTokenExpiredAt(convertDateToLocalDateTime(extractExpiration(newRefreshToken, false)))
                     .build();
         }
-        throw new SecurityException("Invalid refresh token");
+        throw new ApiException(AuthErrorCode.TOKEN_EXCEPTION);
+    }
+
+    // duration과 unit을 사용하여 만료 시간을 계산하는 메서드
+    private long calculateExpiration(CommoneRedisCache cache) {
+        return cache.getUnit().toMillis(cache.getDuration());
     }
 
     private LocalDateTime convertDateToLocalDateTime(Date date) {
